@@ -16,27 +16,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static me.pokerman99.BlockHuntEC.Main.hunts;
 import static me.pokerman99.BlockHuntEC.Main.rootNode;
 
 public class addBlockLocationCommand implements CommandExecutor {
 
-    Optional<BlockType> blockType;
-    CommandSource src;
-    String message;
-    int total;
+    private CommandSource src;
+    private String message;
+    private Optional<Integer> limit;
+    private int total;
 
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        message = args.getOne("hunt name").toString().toUpperCase();
-        blockType = args.getOne(Text.of("block"));
+        message = args.getOne("hunt name").get().toString().toUpperCase();
+        limit = args.getOne(Text.of("limit"));
         total = 0;
         this.src = src;
         UUID randomuuid = UUID.randomUUID();
 
-        if (!Main.hunts.values().contains(message)) {
+        if (!Main.hunts.contains(message)) {
             {
+                if (!limit.isPresent()) {
+                    Utils.sendMessage(src, "&cYou must supply a limit whe making a new hunt!");
+                    return CommandResult.empty();
+                }
+
                 createNewHunt();
+
             }
         } else {
             {
@@ -53,26 +60,22 @@ public class addBlockLocationCommand implements CommandExecutor {
         List<String> temp = new ArrayList<>();
         temp.add("blockhuntec");
         temp.add(String.valueOf((total + 1)));
+        temp.add(message);
+        //temp.add(blockType.get().getId());
         temp.add(randomuuid.toString());
 
         Main.adding.put(UUID.fromString(src.getIdentifier()), new DATA(temp));
 
-        Utils.sendMessage(src, "&aRight click");
+        Utils.sendMessage(src, "&aRight click any block to set location!");
     }
 
     void createNewHunt() {
         {
-            if (!blockType.isPresent()) {
-                Utils.sendMessage(src, "&cWhen making a new hunt you must supply a block that the players must check!");
-                return;
-            }
-        }
+            Main.hunts.add(message);
 
-        {
-            Main.hunts.put(message, message);
-
-            rootNode.getNode("hunts").setValue(Main.hunts.<List<String>>values());
-            rootNode.getNode("totals", message).setValue(0);
+            rootNode.getNode("hunts", "Zenabled").setValue(Main.hunts);
+            rootNode.getNode("hunts", message ,"total").setValue(0);
+            rootNode.getNode("hunts", message ,"limit").setValue(limit.get());
             Main.getInstance().save();
 
             Utils.sendMessage(src, "&aCreating new hunt named, " + message + "!");
@@ -80,8 +83,8 @@ public class addBlockLocationCommand implements CommandExecutor {
     }
 
     void alreadyExists() {
-        Utils.sendMessage(src, "&cAdding new location to hunt" + message + "!");
-        total = rootNode.getNode("totals", message).getInt();
+        Utils.sendMessage(src, "&cAdding new location to hunt " + message + "!");
+        total = rootNode.getNode("hunts", message ,"total").getInt();
     }
 
 }

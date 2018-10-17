@@ -107,7 +107,7 @@ public class DATA extends AbstractData<DATA, DATA.Immutable> {
         }
 
         @Override
-        protected void registerGetters() {
+        public void registerGetters() {
             registerFieldGetter(DATAKeys.BLOCKHUNTDATA, this::getBlockhuntdata);
             registerKeyValue(DATAKeys.BLOCKHUNTDATA, this::blockhuntdata);
         }
@@ -156,7 +156,7 @@ public class DATA extends AbstractData<DATA, DATA.Immutable> {
         }
 
         @Override
-        protected Optional<DATA> buildContent(DataView container) throws InvalidDataException {
+        public Optional<DATA> buildContent(DataView container) throws InvalidDataException {
             return create().from(container);
         }
 

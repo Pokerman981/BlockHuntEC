@@ -18,6 +18,6 @@ public class DATAKeys {
     static {
         TypeToken<List<String>> listStringToken = new TypeToken<List<String>>(){};
         TypeToken<ListValue<String>> listValueStringToken = new TypeToken<ListValue<String>>(){};
-        BLOCKHUNTDATA = KeyFactory.makeListKey(listStringToken, listValueStringToken, DataQuery.of("Blockhuntdata"), "blockhuntec:blockhuntdata", "Blockhuntdata");
+        BLOCKHUNTDATA = KeyFactory.makeListKey(listStringToken, listValueStringToken, DataQuery.of("blockhuntdata"), "blockhuntec:blockhuntdata", "blockhuntdata");
     }
 }

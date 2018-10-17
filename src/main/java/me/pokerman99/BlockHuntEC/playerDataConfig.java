@@ -1,12 +1,12 @@
 package me.pokerman99.BlockHuntEC;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 public class playerDataConfig {
 
@@ -17,6 +17,7 @@ public class playerDataConfig {
     public playerDataConfig(String uuid) {
         try {
             setFile(new File(Main.getInstance().ConfigDir.toFile().getParentFile(), "blockhuntec/playerdata/" + uuid + ".conf"));
+            getFile().getParentFile().mkdirs();
 
             playerDataLoader = HoconConfigurationLoader.builder().setFile(getFile()).build();
             playerDataConfig = playerDataLoader.load();
@@ -44,5 +45,14 @@ public class playerDataConfig {
         return playerDataLoader;
     }
 
-
+    public void setCreationTime() {
+        try {
+            if (playerDataConfig.getNode("Date-Created").isVirtual()) {
+                playerDataConfig.getNode("Date-Created").setValue(Instant.now().toString());
+                playerDataLoader.save(playerDataConfig);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

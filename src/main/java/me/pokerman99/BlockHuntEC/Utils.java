@@ -48,7 +48,7 @@ public class Utils {
 
 
     public static String color(String string) {
-        return TextSerializers.FORMATTING_CODE.serialize(Text.of("&b&l[&e&lBLOCKHUNT&b&l] " + string));
+        return TextSerializers.FORMATTING_CODE.serialize(Text.of("&f&l[&6&lPOKEHUNT&f&l] " + string));
     }
 
     public static void sendMessage(CommandSource sender, String message) {

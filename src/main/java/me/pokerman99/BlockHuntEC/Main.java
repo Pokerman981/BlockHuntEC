@@ -4,6 +4,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import me.pokerman99.BlockHuntEC.commands.addBlockLocationCommand;
 import me.pokerman99.BlockHuntEC.data.DATA;
+import me.pokerman99.BlockHuntEC.listeners.FoundListener;
+import me.pokerman99.BlockHuntEC.listeners.InteractBlockListener;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -52,7 +54,6 @@ public class Main {
     }
 
     public static CommentedConfigurationNode rootNode;
-
     public static CommentedConfigurationNode config() {
         return rootNode;
     }
@@ -76,7 +77,7 @@ public class Main {
     public static Map<UUID, DATA> adding = new HashMap<>();
     public static List<String> removing = new ArrayList<>();
 
-    public static Map<String, String> hunts = new HashMap<>();
+    public static List<String> hunts = new ArrayList<>();
 
 
     @Listener
@@ -107,13 +108,13 @@ public class Main {
         rootNode.getNode("config-version").setValue(1.0);
 
         List<String> hunts = new ArrayList<>();
-        rootNode.getNode("hunts").setValue(hunts);
+        rootNode.getNode("hunts", "Zenabled").setValue(hunts);
     }
 
     void populateVariables() {
         {
             try {
-                rootNode.getNode("hunts").getList(TypeToken.of(String.class)).forEach(s -> hunts.put(s,s));
+                rootNode.getNode("hunts", "Zenabled").getList(TypeToken.of(String.class)).forEach(s -> hunts.add(s));
             } catch (ObjectMappingException e) {e.printStackTrace();}
         }
 
@@ -121,8 +122,8 @@ public class Main {
 
     void registerCommands() {
         CommandSpec addBlockLcationCommand = CommandSpec.builder()
-                .arguments(GenericArguments.onlyOne(GenericArguments.choices(Text.of("hunt name"), hunts)),
-                        GenericArguments.optional(GenericArguments.catalogedElement(Text.of("block"), BlockType.class)))
+                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("hunt name"))),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("limit"))))
                 .permission("blockhuntec.admin.addlocation")
                 .executor(new addBlockLocationCommand())
                 .build();
@@ -136,7 +137,8 @@ public class Main {
     }
 
     void registerListeners() {
-
+        Sponge.getEventManager().registerListeners(instance, new InteractBlockListener());
+        Sponge.getEventManager().registerListeners(instance, new FoundListener());
     }
 
     void dataRegistration() {
